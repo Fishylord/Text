@@ -8,40 +8,35 @@ from textblob import TextBlob
 nltk.download('punkt_tab')
 nltk.download('averaged_perceptron_tagger_eng')
 
-# Define the sample sentence
-sentence = "The quick brown fox jumps over the lazy dog."
+with open("Data_2.txt", "r") as file:
+    sentence = file.read().strip()
+    print(sentence)
 
-# ---------------------------
-# (a) NLTK POS Tagger
-# ---------------------------
-# Tokenize the sentence and apply NLTK's built-in POS tagger.
+# NLTK POS Tagger
 tokens = word_tokenize(sentence)
 nltk_tags = pos_tag(tokens)
 print("NLTK POS Tagger output:")
 print(nltk_tags)
 
-# ---------------------------
-# (b) TextBlob POS Tagger
-# ---------------------------
-# Create a TextBlob object and retrieve POS tags.
+# TextBlob POS Tagger
 blob = TextBlob(sentence)
 textblob_tags = blob.tags
 print("\nTextBlob POS Tagger output:")
 print(textblob_tags)
 
-# ---------------------------
-# (c) Regular Expression (Regex) Tagger
-# ---------------------------
+# Regular Expression (Regex) Tagger
 # Define regex patterns for common word endings.
 patterns = [
-    (r'.*ing$', 'VBG'),       # gerunds
-    (r'.*ed$', 'VBD'),        # past tense verbs
-    (r'.*es$', 'VBZ'),        # 3rd person singular present
-    (r'.*ould$', 'MD'),       # modals
-    (r'.*\'s$', 'NN$'),       # possessive nouns
-    (r'.*s$', 'NNS'),         # plural nouns
-    (r'^-?[0-9]+(.[0-9]+)?$', 'CD'),  # cardinal numbers
-    (r'.*', 'NN')             # default to noun
+    (r'.*ing$', 'VBG'),
+    (r'.*ed$', 'VBD'),
+    (r'.*es$', 'VBZ'),
+    (r'.*ould$', 'MD'),
+    (r'.*\'s$', 'NN$'),
+    (r'.*s$', 'NNS'),
+    (r'^-?[0-9]+(.[0-9]+)?$', 'CD'),
+    (r'.*ly$', 'RB'), 
+    (r'The', 'DT'),
+    (r'.*', 'NN')
 ]
 
 # Create the regex tagger using the defined patterns.
@@ -51,33 +46,26 @@ print("\nRegular Expression Tagger output:")
 print(regex_tags)
 
 
-# ---------------------------
-# (d) Generating Parse Trees
-# ---------------------------
-# Define a simple grammar for our sentence.
-# This grammar supports a noun phrase (NP) with adjectives (AdjP), a verb phrase (VP),
-# and a prepositional phrase (PP) for the complement.
+# Generating Parse Trees
 grammar = CFG.fromstring("""
 S    -> NP VP
 NP   -> Det AdjP N
 AdjP -> Adj | Adj AdjP
-VP   -> V PP
+VP   -> V PP | V Adv | VP Conj VP
 PP   -> P NP
 Det  -> 'The' | 'the'
-N    -> 'fox' | 'dog'
-Adj  -> 'quick' | 'brown' | 'lazy'
-V    -> 'jumps'
-P    -> 'over'
+N    -> 'dog' | 'cat'
+Adj  -> 'big' | 'black' | 'white'
+V    -> 'barked' | 'chased'
+Adv -> 'away'
+P    -> 'at'
+Conj -> 'and'
 """)
 
-# Tokenize the sentence (remove punctuation for parsing)
-tokens = ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']
-
-# Create the chart parser
+tokens = ['The', 'big', 'black', 'dog', 'barked', 'at', 'the', 'white', 'cat', 'and', 'chased', 'away']
 parser = nltk.ChartParser(grammar)
-
-# Parse the tokens and display all parse trees
 print("\nParse Trees:")
 for tree in parser.parse(tokens):
     print(tree)
     tree.pretty_print()
+
