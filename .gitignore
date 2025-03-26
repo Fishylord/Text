@@ -1,3 +1,4 @@
+/.venv
 .venv/
 .venv
-.Part2/clean_data.csv
+Part2/clean_data.csv
